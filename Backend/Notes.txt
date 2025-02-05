@@ -1,0 +1,14 @@
+
+Work to be done as on 10 /18/ 2024 
+
+1- Filtering of the urls and creation of updated vector sotres
+2- Optimization scope exploartion
+3- Prompt enginnering for handle cases like :
+Ask query: tell me about modi
+ {'chatbot_response': 'I\'m sorry, but there is no information about "Modi" in the provided texts about Aptus Data Labs. If you have any query"}
+Expected response : " I DON'T have information on modi, kindly ask query relarted to aptus data labs."
+
+4- Documentations
+5- Docker file addition
+6- Integration script : Prayas / abhinav 
+

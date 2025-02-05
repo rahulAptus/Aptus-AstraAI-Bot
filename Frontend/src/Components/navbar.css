@@ -1,0 +1,21 @@
+.navbar-main {
+  width: 100vw;
+  height: 10vh;
+  background-color: #fff;
+}
+
+.navbar-button {
+  border-radius: 8px;
+  padding: 0.6em 1.2em;
+  font-size: 1em;
+  font-weight: 500;
+  font-family: inherit;
+  background-color: #0062a5;
+  cursor: pointer;
+  transition: background-color 0.25s;
+  outline: none;
+  border: 0;
+}
+.navbar-button:hover {
+  background-color: #8cc63e;
+}
