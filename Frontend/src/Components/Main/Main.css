@@ -1,22 +1,28 @@
+/* Main Section Styling */
 .main {
   flex: 1;
   min-height: 100vh;
   padding-bottom: 15vh;
   position: relative;
+  margin-left: 25%; /* Shift content to the right to avoid overlap with the sidebar */
 }
 
-.main .nav {
+/* .main .nav {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: flex-start;
   font-size: 22px;
   font-weight: 400;
   padding: 20px;
   color: #585858;
-}
+  background-color: white;
+} */
 
 .main .nav img {
-  width: 15%;
+  width: 100px; /* Set the icon's width */
+  height: 100px; /* Set the icon's height */
+  object-fit: contain; /* Maintain aspect ratio */
+  margin-right: 20px;
 }
 
 .main-container {
@@ -24,13 +30,13 @@
   margin: auto;
 }
 
+/* Adjust greeting section (move user up) */
 .main .greet {
-  margin: 17px 0px;
+  margin: 10px 0px; /* Reduce margin top to move it upwards */
   font-size: 50px;
-  /* color: #c4c7c5; */
   color: #000000;
   font-weight: 500;
-  padding: 40px 20px 0px;
+  padding: 20px 20px 0px; /* Reduced padding top */
 }
 
 .main .greet span {
@@ -39,24 +45,26 @@
   -webkit-text-fill-color: transparent;
 }
 
-.main .cards {
+/* Cards Section */
+.cards {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
   gap: 15px;
   padding: 20px;
 }
 
-.main .card {
+/* Card Styling */
+.card {
   height: 200px;
   padding: 15px;
-  /* background-color: #f0f4f9; */
-  background: linear-gradient(135deg, #0062a5, #8cc63e);
+  background-color: #f0f4f9;
   position: relative;
   cursor: pointer;
   border-radius: 20px;
+  box-shadow: none;
 }
 
-.main .card img {
+.card img {
   width: 35px;
   padding: 5px;
   position: absolute;
@@ -65,15 +73,17 @@
   bottom: 10px;
   right: 10px;
 }
-.main .card p {
-  color: #fff;
+
+.card p {
+  color: #000;
   font-size: 17px;
 }
 
-.main .card:hover {
+.card:hover {
   background: linear-gradient(135deg, #8cc63e, #0062a5);
 }
 
+/* Bottom Section */
 .main-bottom {
   position: absolute;
   bottom: 0;
@@ -113,43 +123,45 @@
   gap: 15px;
 }
 
-.main .bottom-info {
-  font-size: 13px;
-  margin: 15px auto;
-  text-align: center;
-  font-weight: 300;
-}
-
-.result {
+.chat-history {
   padding: 0px 5%;
   max-height: 70vh;
   overflow-y: scroll;
 }
 
-.result::-webkit-scrollbar {
-  display: none;
+.chat-entry {
+  max-width: 80%;
+  padding: 12px;
+  margin: 10px 0;
+  border-radius: 20px;
+  font-size: 16px;
+  line-height: 1.5;
 }
 
-.result-title {
-  margin: 40px 0px;
+.user-entry {
+  background-color: #d9e2f2;
+  align-self: flex-end;
+}
+
+.chatbot-entry {
+  background-color: #f1f1f1;
+  align-self: flex-start;
+}
+
+.chat-entry p {
+  margin: 0;
+  word-wrap: break-word;
+}
+
+.loader {
   display: flex;
-  align-items: center;
-  gap: 20px;
+  flex-direction: column;
+  gap: 4px;
 }
 
-.result img {
-  width: 40px;
-  border-radius: 50%;
-}
-
-.result-data {
-  display: flex;
-  align-items: start;
-  gap: 20px;
-}
-
-.result-data p {
-  font-size: 17px;
-  font-weight: 300;
-  line-height: 1.8;
+.loader hr {
+  border: none;
+  border-top: 2px solid #d9e2f2;
+  margin: 2px 0;
+  width: 20px;
 }
