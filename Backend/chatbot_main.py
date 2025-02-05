@@ -128,7 +128,6 @@ async def chat_bot_BL(data:QueryData):
         # Simulate getting the end flag from the frontend
         # end = input("Is this your last query (yes/no)? ").strip().lower() == "yes" 
         # Database Connection for FAq's(db1)
-
         # Flag harmful query
         print("flagging")
         flag = moderation(user_query) # Moderation Check
