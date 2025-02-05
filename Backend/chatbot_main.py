@@ -108,10 +108,9 @@ class QueryData(BaseModel):
 ############################################### B L - T E S T I N G ########################################################
 # making the function for testing the  end to end business logic in the script
 @app.post("/prompt")
-async def chat_bot_BL():
+async def chat_bot_BL(data:QueryData):
     ''' Single function which takes the user input and gives response
     in integration this function should be called
-
     '''
     t_id = 11223;  # thread_id   
     from helpers.graph import graph  # Inititalizing the graph
@@ -125,7 +124,7 @@ async def chat_bot_BL():
         # Taking the input from the front end (user_query: string, thread_id = int, end = Boll)        
         end = end # front end trigger which will stop the while loop
         # user_query =  input("Enter your query: ")  # I can replace this input by the input function by the UI 
-        # user_query = data.prompt
+        user_query = data.prompt
         # Simulate getting the end flag from the frontend
         # end = input("Is this your last query (yes/no)? ").strip().lower() == "yes" 
         # Database Connection for FAq's(db1)
