@@ -1,0 +1,5 @@
+The sidebar and main responsive is done
+the framer motion is added
+Null part is done showing chats
+little more layout improvement and time management to be done
+the function of generated token is done and keep in main.jsx comment section
