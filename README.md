@@ -1,6 +1,6 @@
 # **AstraAI**  
 
-🚀 **Revolutionizing AI-driven interactions with intelligent document search, summarization, and Q&A!**  
+ **Revolutionizing AI-driven interactions with intelligent document search, summarization, and Q&A!**  
 
 ## 📌 **About the Project**  
 This chatbot is designed for **Aptus Data Labs**, utilizing advanced **LLM models** (like OpenAI & LangChain) to provide:  
@@ -21,7 +21,6 @@ Developed with **FastAPI (backend)** and **React (frontend)**, this chatbot is o
 
 ## 🔧 **Installation & Setup**
 ### 🔹 **1. Clone the Repository**
-```sh
 git clone https://github.com/your-repo/chatbot-aptus.git
 cd chatbot-aptus
 ### 🔹 **2. Backend Setup
