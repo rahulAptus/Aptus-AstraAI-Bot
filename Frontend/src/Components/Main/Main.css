@@ -1,48 +1,102 @@
+/* Prevent body and html from causing scrollbars */
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  overflow: hidden; /* No scrollbar on the entire page */
+}
+
 /* Main Section Styling */
 .main {
-  flex: 1;
-  min-height: 100vh;
-  padding-bottom: 15vh;
-  position: relative;
-  margin-left: 25%; /* Shift content to the right to avoid overlap with the sidebar */
-}
-
-/* .main .nav {
   display: flex;
-  align-items: center;
-  justify-content: flex-start;
-  font-size: 22px;
-  font-weight: 400;
-  padding: 20px;
-  color: #585858;
-  background-color: white;
-} */
-
-.main .nav img {
-  width: 100px; /* Set the icon's width */
-  height: 100px; /* Set the icon's height */
-  object-fit: contain; /* Maintain aspect ratio */
-  margin-right: 20px;
+  flex-direction: column;
+  min-height: 100vh;
+  position: relative;
+  margin-left: 20%; /* Sidebar width */
+  width: 80%; /* Main section width, excluding the sidebar */
+  overflow-x: hidden; /* Prevent horizontal overflow */
+  height: 100vh; /* Full height */
+  padding-bottom: 80px; /* Add space for the fixed prompt bar */
 }
 
+/* Main container (for content) */
 .main-container {
-  max-width: 900px;
-  margin: auto;
+  flex-grow: 1;
+  margin-left: 10px;
+  overflow-y: auto; /* Enable scrolling if content overflows */
+  height: 100%; /* Ensure it fills the remaining height */
+  width: 100%; /* Ensure it takes full width */
 }
 
-/* Adjust greeting section (move user up) */
+/* Chat History Section - Scrollable */
+.chat-history {
+  padding: 0px 2%;
+  max-height: calc(100vh - 80px); /* Full height minus space for fixed bottom bar */
+  overflow-y: auto; /* Enable vertical scrolling for the chat history */
+  width: 100%; /* Ensure it uses full width of the container */
+  margin-bottom: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 15px; /* Add space between messages */
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* Internet Explorer 10+ */
+}
+
+/* Hide scrollbar visually but keep it functional for webkit browsers */
+.chat-history::-webkit-scrollbar {
+  display: none; /* For Chrome, Safari, and Opera */
+}
+
+/* Chat Entry Styling */
+.chat-entry {
+  padding: 6px 8px;
+  margin: 8px 0;
+  border-radius: 20px;
+  font-size: 16px;
+  line-height: 1.5;
+  max-width: 75%;
+  word-wrap: break-word;
+  display: inline-block;
+  width: auto;
+}
+
+/* User's message - align right */
+.user-entry {
+  background-color: #d9e2f2;
+  align-self: flex-end; /* Align user messages to the right */
+  margin-left: auto; /* Optional to avoid unnecessary gap */
+  display: inline-block;
+  max-width: 75%; /* Adjust width based on content */
+}
+
+/* Chatbot's message - align left */
+.chatbot-entry {
+  background-color: #f1f1f1;
+  align-self: flex-start; /* Align chatbot messages to the left */
+  margin-right: auto; /* Optional to avoid unnecessary gap */
+  display: inline-block;
+  max-width: 75%; /* Adjust width based on content */
+}
+
+/* Bottom Section (Fixed prompt bar) */
+.main-bottom {
+  position: fixed;
+  margin-left: 20px;
+  bottom: 0;
+  width: 100%;
+  background: white;
+  padding: 1rem;
+  box-shadow: none;
+  z-index: 10; /* Ensure it stays above other elements */
+}
+
 .main .greet {
-  margin: 10px 0px; /* Reduce margin top to move it upwards */
-  font-size: 50px;
+  margin: 0px 0px; /* Further reduced margin to move it upwards */
+  font-size: 45px;
   color: #000000;
   font-weight: 500;
-  padding: 20px 20px 0px; /* Reduced padding top */
-}
-
-.main .greet span {
-  background: -webkit-linear-gradient(16deg, #0062a5, #8cc63e);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+  padding: 15px 20px 0px;
+  margin-left: 20px;
 }
 
 /* Cards Section */
@@ -55,13 +109,15 @@
 
 /* Card Styling */
 .card {
-  height: 200px;
+  height: 150px;
   padding: 15px;
   background-color: #f0f4f9;
   position: relative;
   cursor: pointer;
   border-radius: 20px;
   box-shadow: none;
+  transition: transform 0.3s ease;
+  background: linear-gradient(135deg, #8cc63e, #0062a5);
 }
 
 .card img {
@@ -80,19 +136,11 @@
 }
 
 .card:hover {
-  background: linear-gradient(135deg, #8cc63e, #0062a5);
+  background: linear-gradient(135deg, #6bb52e, #00508d);
+  transform: scale(1.05);
 }
 
 /* Bottom Section */
-.main-bottom {
-  position: absolute;
-  bottom: 0;
-  width: 100%;
-  max-width: 900px;
-  padding: 0px 20px;
-  margin: auto;
-}
-
 .search-box {
   display: flex;
   align-items: center;
@@ -121,47 +169,4 @@
   display: flex;
   align-items: center;
   gap: 15px;
-}
-
-.chat-history {
-  padding: 0px 5%;
-  max-height: 70vh;
-  overflow-y: scroll;
-}
-
-.chat-entry {
-  max-width: 80%;
-  padding: 12px;
-  margin: 10px 0;
-  border-radius: 20px;
-  font-size: 16px;
-  line-height: 1.5;
-}
-
-.user-entry {
-  background-color: #d9e2f2;
-  align-self: flex-end;
-}
-
-.chatbot-entry {
-  background-color: #f1f1f1;
-  align-self: flex-start;
-}
-
-.chat-entry p {
-  margin: 0;
-  word-wrap: break-word;
-}
-
-.loader {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.loader hr {
-  border: none;
-  border-top: 2px solid #d9e2f2;
-  margin: 2px 0;
-  width: 20px;
 }
