@@ -1,4 +1,4 @@
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException,WebSocket
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from langchain_openai import ChatOpenAI
@@ -16,7 +16,7 @@ load_dotenv(override=True)
 from helpers.graph import graph  # Inititalizing the graph
 from langchain.globals import set_llm_cache
 from langchain_community.cache import InMemoryCache
-
+import asyncio
 # import streamlit as st
 # Main Script for Business Logic
 # To run this script, execute the following command in your command prompt:
@@ -142,21 +142,85 @@ async def chat_bot_BL(data:QueryData):
             if i == 10:
                 end = True
                 print("[INFO]: Last query--> Stopping the session...")
-
             response = processing_agent_response(messages, user_query)
             print("Response:", response)
-            return response
+            chatbot_response = response.get("chatbot_response", "No response available")
+            print ("Chatbot Response:", chatbot_response)
+            print ("Sources:", response["sources"])
+            
+            return response,response["sources"]
         else:
+            print("[INFO]: Last query --> Stopping the session...")
+            end = True        
             response = {
-            "chatbot_response": "Kindly ask Relevant Question.",
-            "sources": ["Moderation"],
-             "user_query":user_query, 
-             "display_output_format": "Markdown"
-                }
-            print("Response:", response)
+                "chatbot_response": "Kindly ask Relevant Question.",
+                "sources": ["Moderation"],
+                "user_query":user_query, 
+                "display_output_format": "Markdown"
+                    }
+            print(response)
             return response
    
 print("Chat session ended.")
+
+
+# async def chat_bot_BL(data: QueryData):
+#     """Handles user queries and streams chatbot responses in chunks."""
+    
+#     t_id = 11223  # Thread ID
+#     config = {"configurable": {"thread_id": f"{t_id}"}}
+    
+#     print("[INFO]: Connected to the agent, you may ask your queries now!")
+
+#     user_query = data.prompt
+#     flag = moderation(user_query)  # Moderation Check
+#     print("Moderation flag:", flag)
+
+#     if flag:
+#         response = {
+#             "chatbot_response": "Kindly ask a relevant question.",
+#             "sources": ["Moderation"],
+#             "user_query": user_query,
+#             "display_output_format": "Markdown"
+#         }
+#         yield response["chatbot_response"]
+#         return
+
+#     ans_inst = "Don’t justify your answers. Don’t give information not mentioned in the context information."
+#     messages = [HumanMessage(content=f"{user_query} # Answer Instructions: {ans_inst} ")]
+    
+#     messages = graph.invoke({"messages": messages}, config)
+#     response_text = processing_agent_response(messages, user_query)
+
+#     # Split response into chunks (adjust size as needed)
+#     for chunk in split_into_chunks(response_text, size=50):
+#         yield chunk
+#         await asyncio.sleep(0.1)  # Simulate streaming delay
+
+#     print("[INFO]: Response streaming completed.")
+
+
+# @app.websocket("/ws")
+# async def websocket_endpoint(websocket: WebSocket):
+#     """Handles WebSocket connection for real-time chat responses in chunks."""
+#     await websocket.accept()
+#     try:
+#         while True:
+#             prompt = await websocket.receive_text()
+#             query_data = QueryData(prompt=prompt)
+            
+#             # Stream AI response in chunks
+#             async for chunk in chat_bot_BL(query_data):
+#                 await websocket.send_text(chunk)
+            
+#             # Send a special termination signal (optional)
+#             await websocket.send_text("[END]")  
+#     except Exception as e:
+#         print(f"WebSocket error: {e}")
+#     finally:
+#         await websocket.close()
+
+
 
 if __name__ == "__main__":
     from helpers.graph import graph

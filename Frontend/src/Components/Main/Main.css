@@ -14,7 +14,23 @@
   padding: 20px;
   color: #585858;
 }
+.loader {
+  width: 50px;
+  height: 50px;
+  border: 5px solid #ddd;
+  border-top: 5px solid #3498db;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
 
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
 .main .nav img {
   width: 15%;
 }
@@ -124,6 +140,8 @@
   padding: 0px 5%;
   max-height: 70vh;
   overflow-y: scroll;
+  display: flex;
+  flex-direction: column;
 }
 
 .result::-webkit-scrollbar {
@@ -152,4 +170,28 @@
   font-size: 17px;
   font-weight: 300;
   line-height: 1.8;
+}
+
+.result-text {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+.result-text .source_box {
+  height: 150px;
+  padding: 15px;
+  background-color: #0062a5;
+  cursor: pointer;
+  border-radius: 20px;
+  color: #ffffff;
+  text-align: center;
+}
+.sources a {
+  text-decoration: none;
+  color: #ffffff;
+}
+
+.sources {
+  display: flex;
+  gap: 10px;
 }

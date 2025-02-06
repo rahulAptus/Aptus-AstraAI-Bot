@@ -2,22 +2,49 @@ import { useState } from "react";
 import "./Main.css";
 import { assets } from "../../assets/assets";
 import axios from "axios";
+import ReactMarkdown from "react-markdown";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faUser } from "@fortawesome/free-solid-svg-icons";
 
 const Main = () => {
   const [prompt, setPrompt] = useState("");
+  const [input, setInput] = useState("");
   const [showResult, setShowResult] = useState(false);
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState("");
+  const [sources, setSources] = useState([]);
 
   const sendRequest = async () => {
+    setShowResult(true);
+    setLoading(true);
+    if (input.trim() === "") return;
+    setPrompt((prev) => [...prev, input]);
     try {
       const res = await axios.post("http://localhost:8000/prompt", {
-        prompt: prompt,
+        prompt: input,
       });
-      setShowResult(true);
       setLoading(false);
-      console.log("Response from backend:", res.data);
-      setResult(res.data.chatbot_response); // Set the chatbot response directly
+      const data = res.data[0] || {}; // Default to an empty object if undefined
+      let responseText = data.chatbot_response;
+      const isHTML = /<\/?[a-z][\s\S]*>/i.test(responseText);
+      let accumulatedText = "";
+      if (isHTML) {
+        setResult(responseText);
+      } else {
+        responseText.split("").forEach((char, index) => {
+          setTimeout(() => {
+            accumulatedText += char;
+            setResult(accumulatedText);
+          }, index * 50); // Simulate streaming effect (50ms delay per character)
+        });
+      }
+      // Sources are fetched from the Backend
+      let sourceArray = data.sources || [];
+      if (typeof sourceArray === "string") {
+        sourceArray = sourceArray.split(",").map((source) => source.trim()); // Split on commas if it's a string
+      }
+      setInput("");
+      setSources(sourceArray); // Update sources
     } catch (error) {
       console.error("Error fetching response:", error);
       setShowResult(true);
@@ -59,19 +86,40 @@ const Main = () => {
         ) : (
           <div className="result">
             <div className="result-title">
-              <img src={assets.user_icon} alt="" />
+              <FontAwesomeIcon icon={faUser} color="#8cc63e" size="xl" />
               <p>{prompt}</p>
             </div>
             <div className="result-data">
-              <img src={assets.gemini_icon} alt="" />
+              <img
+                src={assets.logo_buddy}
+                width={"100px"}
+                height={"40px"}
+                alt=""
+              />
               {loading ? (
-                <div className="loader">
-                  <hr />
-                  <hr />
-                  <hr />
-                </div>
+                <div className="loader"></div>
               ) : (
-                <p dangerouslySetInnerHTML={{ __html: result }}></p>
+                <div className="result-text">
+                  <h3>Sources</h3>
+                  <div className="sources">
+                    {sources.length > 0 ? (
+                      sources.map((source, index) => (
+                        <div key={index} className="source_box">
+                          <a
+                            href={source}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                          >
+                            Aptus Data Labs
+                          </a>
+                        </div>
+                      ))
+                    ) : (
+                      <p>No sources available</p>
+                    )}
+                  </div>
+                  <p dangerouslySetInnerHTML={{ __html: result }}></p>
+                </div>
               )}
             </div>
           </div>
@@ -80,15 +128,15 @@ const Main = () => {
         <div className="main-bottom">
           <div className="search-box">
             <input
-              onChange={(e) => setPrompt(e.target.value)}
-              value={prompt}
+              onChange={(e) => setInput(e.target.value)}
+              value={input}
               type="text"
               placeholder="Enter a prompt here "
             />
             <div>
               <img src={assets.gallery_icon} alt="" />
               <img src={assets.mic_icon} alt="" />
-              {prompt ? (
+              {input ? (
                 <img
                   onClick={() => sendRequest()}
                   src={assets.send_icon}
