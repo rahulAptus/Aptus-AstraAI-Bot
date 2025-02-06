@@ -12,10 +12,10 @@ Developed with **FastAPI (backend)** and **React (frontend)**, this chatbot is o
 ---
 
 ## 🏗 **Tech Stack**
-- **Backend:** FastAPI ⚡ | Python 🐍 | LangChain  
-- **Frontend:** React ⚛️   
+- **Backend:** FastAPI | Python | LangChain  
+- **Frontend:** React    
 - **Database:** Vector DB for embeddings  
-- **AI Models:** OpenAI GPT-4 🚀 | LangChain Embeddings  
+- **AI Models:** OpenAI GPT-4  | LangChain Embeddings  
 
 ---
 
@@ -27,14 +27,24 @@ cd chatbot-aptus
 cd backend
 pip install -r requirements.txt
 python -m chatbot_main
-### 🔹 **.3Frontend Setup
+### 🔹 **3.Frontend Setup
 cd frontend
 npm install
 npm start
 
-🚀 Features
+ Features
+
+
 🔹 Conversational AI – Ask questions in natural language.
+
+
 🔹 Real-time Summarization – Extract key insights from uploaded documents.
+
+
 🔹 Multi-Turn Memory – Keeps track of previous interactions.
+
+
 🔹 Smart Moderation – Filters inappropriate queries.
+
+
 🔹 Scalable Architecture – Easily deployable on AWS/GCP/Azure.
