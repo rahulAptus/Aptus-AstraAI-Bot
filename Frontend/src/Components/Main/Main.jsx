@@ -20,19 +20,28 @@ const Main = () => {
   const generateThreadId = () => {
     return Math.floor(Math.random() * 1000000);
   };
+
   useEffect(() => {
     setThreadId(generateThreadId());
   }, []);
 
   const scrollToBottom = () => {
     if (dummyRef.current) {
-      dummyRef.current.scrollIntoView({ behavior: "smooth" });
+      dummyRef.current.scrollIntoView({ behavior: "smooth",block: "end"});
     }
   };
+  
 
   useEffect(() => {
     scrollToBottom();
   }, [result, loading]); // Run when messages update
+
+ 
+  
+
+  // useEffect(() => {
+  //   setTimeout(scrollToBottom, 200); // Small delay to ensure message renders first
+  // }, [result, loading]);
 
   const sendRequest = async () => {
     if (prompt.trim() === "") return;
@@ -45,8 +54,10 @@ const Main = () => {
     setLoading(true);
     setPrompt("");
 
+    setTimeout(() => scrollToBottom(), 50);
+
     try {
-      const res = await axios.post("http://localhost:8000/prompt", {
+      const res = await axios.post("http://localhost:8020/prompt", {
         prompt: userMessage,
         thread_id: threadId,
       });
@@ -84,6 +95,11 @@ const Main = () => {
                 ];
               }
             });
+            // if (index === responseText.length - 1) {
+            //   setTimeout(() => {
+            //     scrollToBottom();
+            //   }, 100);}
+            scrollToBottom();
           }, index * 50); // Simulate streaming effect (50ms delay per character)
         });
       }
@@ -95,12 +111,10 @@ const Main = () => {
       } else {
         setShowSources(false);
       }
-      console.log("Sources:", sources);
       setSources((prevSource) => [
         ...prevSource,
         { type: "chatbot", text: sourceArray },
       ]);
-      // setSources(sourceArray); // Update sources
     } catch (error) {
       console.error("Error fetching response:", error);
       setShowResult(true);
@@ -252,8 +266,8 @@ const Main = () => {
                   transition={{ duration: 0.5 }}
                 ></motion.div>
               )}
-            </div>
-            <div ref={dummyRef} />
+            </div >
+            <div ref={dummyRef} style={{ marginBottom: "100px" }}  />
           </>
         )}
 
