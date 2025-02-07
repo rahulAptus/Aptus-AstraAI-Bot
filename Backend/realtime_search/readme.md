@@ -1,0 +1,6 @@
+## Aptbot
+AptBot is an AI-driven search and analysis tool that fetches relevant data from Google Custom Search (CSE) and processes it using OpenAI's GPT-4o. It filters and extracts only the most relevant information related to Aptus Data Labs, ensuring high-quality results.
+
+Features: 1.Google Custom Search Integration: Retrieves data from selected sources (LinkedIn, Instagram, Facebook). 2.LLM Processing with OpenAI GPT-4o: Extracts relevant insights from search results. 3.Source Filtering: Ensures only relevant sources are included. 4.Image Caption Generation: Generates meaningful captions for images in the search results. 5.Customizable Data Sources: Users can choose specific platforms to search from.
+
+Google Custom Search Setup: 1.Go to Google Programmable Search Engine. 2.Click on "Add" to create a new search engine. 3.In the Sites to search field, add the URLs of the sources(linkedin.com, instagram.com, facebook.com). 4.Save and copy the CSE ID. 5.Get an API Key from Google Cloud Console. 6.Store both the API Key and CSE ID in your .env file.

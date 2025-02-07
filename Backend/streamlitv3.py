@@ -158,7 +158,7 @@ if user_query := st.chat_input("Write your query (max 200 characters):", max_cha
                         else:
                             print("Sources data type is not a list.")
                         
-                # Handle Markdown response format
+
                 else:
                     with st.chat_message("assistant"):
                         st.markdown(response.get("chatbot_response"))

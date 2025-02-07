@@ -12,3 +12,8 @@
   min-height: 100vh;
   display: flex;
 }
+
+li {
+  padding: 0.2em;
+  margin-left: 1em;
+}

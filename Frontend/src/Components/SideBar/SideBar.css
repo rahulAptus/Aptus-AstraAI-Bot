@@ -5,100 +5,25 @@
   flex-direction: column;
   justify-content: space-between;
   align-items: center;
-  background-color: #f0f4f9;
-  padding: 25px 15px;
+  background: linear-gradient(135deg, #f0f4f9, #d9e2f2);
+  padding: 30px 20px;
+  box-shadow: 5px 0 15px rgba(0, 0, 0, 0.1);
+  border-right: 2px solid rgba(0, 0, 0, 0.05);
+  position: fixed; /* Fixed sidebar */
+  top: 0;
+  left: 0;
+  bottom: 0;
+  z-index: 10; /* Ensure it's always on top */
 }
 
-.sidebar img {
-  width: 20px;
-}
-
-.sidebar .menu {
-  display: block;
-  margin-left: 10px;
-  cursor: pointer;
-}
-
-.sidebar .new-chat {
-  width: 250px;
-  margin-top: 50px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-  padding: 10px;
-  background-color: #d9e2f2;
-  border-radius: 50px;
+.sidebar-intro {
   font-size: 18px;
-  color: #0062a5;
+  color: #2c3e50;
   font-weight: 600;
-  cursor: pointer;
-  border: none;
-}
-
-.sidebar .new-chat > img {
-  width: 20px;
-}
-
-.sidebar .recent {
-  display: flex;
-  flex-direction: column;
-}
-
-.sidebar .recent-title {
-  margin-top: 30px;
-  margin-bottom: 20px;
-}
-
-.sidebar .recent-entry {
-  display: flex;
-  align-items: start;
-  gap: 10px;
-  padding: 10px;
-  padding-right: 40px;
-  border-radius: 50px;
-  color: #282828;
-  cursor: pointer;
-}
-
-.sidebar .recent-entry:hover {
-  background-color: #e2e6eb;
-}
-
-.sidebar .bottom {
-  display: flex;
-  flex-direction: column;
-}
-
-.sidebar .bottom-item > button {
-  display: flex;
-  gap: 10px;
-  align-items: center;
-  justify-content: center;
-  padding-right: 10px;
-  cursor: pointer;
-  padding: 10px 15px;
-  outline: none;
-  border: none;
-  background-color: #0062a5;
-}
-
-.sidebar .bottom-item > button:hover {
-  background-color: #013e71;
-}
-.settings > p {
-  font-size: 18px;
-  font-weight: 600;
-  color: #ffffff;
-}
-
-.sidebar .bottom-item .settings {
-  width: 250px;
-  border-radius: 50px;
-}
-.source-box {
-  margin: 5px 0;
-  padding: 8px;
-  background-color: #f5f5f5;
-  border-left: 4px solid #007bff;
+  line-height: 1.6;
+  padding: 15px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.3);
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.05);
+  margin-bottom: 30px;
 }

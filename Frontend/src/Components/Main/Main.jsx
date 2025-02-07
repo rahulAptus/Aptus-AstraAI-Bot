@@ -1,50 +1,106 @@
-import { useState } from "react";
-import "./Main.css";
+import { useState, useEffect, useRef } from "react";
 import { assets } from "../../assets/assets";
 import axios from "axios";
 import ReactMarkdown from "react-markdown";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faUser } from "@fortawesome/free-solid-svg-icons";
+import { motion } from "framer-motion";
+import "./Main.css";
 
 const Main = () => {
   const [prompt, setPrompt] = useState("");
-  const [input, setInput] = useState("");
+  const [isHTML, setIsHTML] = useState(false);
   const [showResult, setShowResult] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [result, setResult] = useState("");
+  const [result, setResult] = useState([]);
   const [sources, setSources] = useState([]);
+  const [showSources, setShowSources] = useState(false);
+  const [threadId, setThreadId] = useState(0);
+  const chatContainerRef = useRef(null);
+  const dummyRef = useRef(null); // Reference for auto-scroll
+
+  const generateThreadId = () => {
+    return Math.floor(Math.random() * 1000000);
+  };
+  useEffect(() => {
+    setThreadId(generateThreadId());
+  }, []);
+
+  const scrollToBottom = () => {
+    if (dummyRef.current) {
+      dummyRef.current.scrollIntoView({ behavior: "smooth" });
+    }
+  };
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [result, loading]); // Run when messages update
 
   const sendRequest = async () => {
+    if (prompt.trim() === "") return;
+    const userMessage = prompt;
+    setResult((prevResult) => [
+      ...prevResult,
+      { type: "user", text: userMessage },
+    ]);
     setShowResult(true);
     setLoading(true);
-    if (input.trim() === "") return;
-    setPrompt((prev) => [...prev, input]);
+    setPrompt("");
+
     try {
       const res = await axios.post("http://localhost:8000/prompt", {
-        prompt: input,
+        prompt: userMessage,
+        thread_id: threadId,
       });
       setLoading(false);
       const data = res.data[0] || {}; // Default to an empty object if undefined
       let responseText = data.chatbot_response;
       const isHTML = /<\/?[a-z][\s\S]*>/i.test(responseText);
       let accumulatedText = "";
+
       if (isHTML) {
-        setResult(responseText);
+        setIsHTML(true);
+        setResult((prevResult) => [
+          ...prevResult,
+          { type: "chatbot", text: responseText },
+        ]);
       } else {
+        setIsHTML(false);
         responseText.split("").forEach((char, index) => {
           setTimeout(() => {
             accumulatedText += char;
-            setResult(accumulatedText);
+            setResult((prevResult) => {
+              // Update only the last chatbot message
+              if (
+                prevResult.length > 0 &&
+                prevResult[prevResult.length - 1].type === "chatbot"
+              ) {
+                return [
+                  ...prevResult.slice(0, -1), // Remove the last chatbot message
+                  { type: "chatbot", text: accumulatedText }, // Update it with new text
+                ];
+              } else {
+                return [
+                  ...prevResult,
+                  { type: "chatbot", text: accumulatedText },
+                ];
+              }
+            });
           }, index * 50); // Simulate streaming effect (50ms delay per character)
         });
       }
-      // Sources are fetched from the Backend
+
       let sourceArray = data.sources || [];
+      setShowSources(true);
       if (typeof sourceArray === "string") {
-        sourceArray = sourceArray.split(",").map((source) => source.trim()); // Split on commas if it's a string
+        sourceArray = sourceArray.split(",").map((source) => source.trim());
+      } else {
+        setShowSources(false);
       }
-      setInput("");
-      setSources(sourceArray); // Update sources
+      console.log("Sources:", sources);
+      setSources((prevSource) => [
+        ...prevSource,
+        { type: "chatbot", text: sourceArray },
+      ]);
+      // setSources(sourceArray); // Update sources
     } catch (error) {
       console.error("Error fetching response:", error);
       setShowResult(true);
@@ -52,104 +108,197 @@ const Main = () => {
     }
   };
 
+  const handleKeyPress = (e) => {
+    if (e.key === "Enter") {
+      sendRequest();
+    }
+  };
+
   return (
-    <div className="main">
-      <div className="nav">
-        <img src={assets.astra_icon} alt="" />
-      </div>
-      <div className="main-container">
+    <div className="main" style={{ overflow: "hidden" }}>
+      <motion.div
+        className="nav"
+        initial={{ y: -50, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ duration: 0.5 }}
+      >
+        <img src={assets.astra_icon} alt="Astra-Logo" />
+      </motion.div>
+
+      <div className="main-container" ref={chatContainerRef}>
         {!showResult ? (
           <>
-            <div className="greet">
+            <motion.div
+              className="greet"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.7 }}
+            >
               <span>Hello, User</span>
               <p>How may I help you today?</p>
-            </div>
-            <div className="cards">
-              <div className="card">
-                <p>Suggest beautiful places to see on an upcoming road trip</p>
-                <img src={assets.compass_icon} alt="" />
-              </div>
-              <div className="card">
-                <p>Briefly summarize this concept: urban planning</p>
-                <img src={assets.bulb_icon} alt="" />
-              </div>
-              <div className="card">
-                <p>Brainstorm team bonding activities for our work retreat</p>
-                <img src={assets.message_icon} alt="" />
-              </div>
-              <div className="card">
-                <p>Improve the readability of the following code</p>
-                <img src={assets.code_icon} alt="" />
-              </div>
-            </div>
+            </motion.div>
+
+            <motion.div
+              className="cards"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+            >
+              {[
+                {
+                  text: "Give me a brief description about Aptus Data Labs",
+                  icon: assets.compass_icon,
+                },
+                {
+                  text: "What are the Projects covered by the Aptus Data Labs",
+                  icon: assets.bulb_icon,
+                },
+                {
+                  text: "What are the products developed by the Aptus Data Labs",
+                  icon: assets.message_icon,
+                },
+                {
+                  text: "Book a meeting with Aptus Data Labs for further information",
+                  icon: assets.code_icon,
+                },
+              ].map((item, index) => (
+                <motion.div
+                  key={index}
+                  className="card"
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={() => setPrompt(item.text)}
+                >
+                  <p>{item.text}</p>
+                  <img src={item.icon} alt="Icon" />
+                </motion.div>
+              ))}
+            </motion.div>
           </>
         ) : (
-          <div className="result">
-            <div className="result-title">
-              <FontAwesomeIcon icon={faUser} color="#8cc63e" size="xl" />
-              <p>{prompt}</p>
-            </div>
-            <div className="result-data">
-              <img
-                src={assets.logo_buddy}
-                width={"100px"}
-                height={"40px"}
-                alt=""
-              />
-              {loading ? (
-                <div className="loader"></div>
-              ) : (
-                <div className="result-text">
-                  <h3>Sources</h3>
-                  <div className="sources">
-                    {sources.length > 0 ? (
-                      sources.map((source, index) => (
-                        <div key={index} className="source_box">
-                          <a
-                            href={source}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                          >
-                            Aptus Data Labs
-                          </a>
-                        </div>
-                      ))
-                    ) : (
-                      <p>No sources available</p>
-                    )}
-                  </div>
-                  <p dangerouslySetInnerHTML={{ __html: result }}></p>
-                </div>
+          <>
+            <div className="chat-container" style={{ overflowY: "auto" }}>
+              {/* Chat History */}
+              <div
+                className="chat-history"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.5 }}
+                style={{
+                  maxHeight: "calc(100vh - 150px)",
+                }}
+              >
+                {Array.isArray(result) &&
+                  result.map((entry, index) => (
+                    <motion.div
+                      key={index}
+                      className={`chat-entry ${
+                        entry.type === "user" ? "user-entry" : "chatbot-entry"
+                      }`}
+                      initial={{
+                        x: entry.type === "user" ? 50 : -50,
+                        opacity: 0,
+                      }}
+                      animate={{ x: 0, opacity: 1 }}
+                      transition={{ duration: 0.5 }}
+                    >
+                      {/* Profile Image */}
+                      <img
+                        src={
+                          entry.type === "user"
+                            ? assets.user_avatar
+                            : assets.logo_buddy
+                        }
+                        alt={entry.type === "user" ? "User" : "Chatbot"}
+                        className="profile-img"
+                      />
+
+                      {/* Message Text */}
+                      <div className="message-content">
+                        {isHTML ? (
+                          <div
+                            dangerouslySetInnerHTML={{ __html: entry.text }}
+                          />
+                        ) : (
+                          // Render as Markdown
+                          <ReactMarkdown>{entry.text}</ReactMarkdown>
+                        )}
+                        {showSources && sources.length > 0 && (
+                          <div className="sources">
+                            <h3>Sources</h3>
+                            {sources.map((source, idx) => (
+                              <div key={idx} className="source_box">
+                                <a
+                                  href={source}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                >
+                                  {source}
+                                </a>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    </motion.div>
+                  ))}
+              </div>
+              {/* Loading Indicator */}
+              {loading && (
+                <motion.div
+                  className="loader"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ duration: 0.5 }}
+                ></motion.div>
               )}
             </div>
-          </div>
+            <div ref={dummyRef} />
+          </>
         )}
 
-        <div className="main-bottom">
+        <motion.div
+          className="main-bottom"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.7 }}
+          style={{
+            position: "fixed",
+            bottom: 0,
+            background: "white",
+            padding: "1rem",
+            boxShadow: "none",
+            zIndex: 10,
+          }}
+        >
           <div className="search-box">
             <input
-              onChange={(e) => setInput(e.target.value)}
-              value={input}
+              onChange={(e) => setPrompt(e.target.value)}
+              value={prompt}
               type="text"
-              placeholder="Enter a prompt here "
+              placeholder="Chat with Astra - Where Innovation Meets Conversation"
+              onKeyDown={handleKeyPress}
             />
             <div>
-              <img src={assets.gallery_icon} alt="" />
-              <img src={assets.mic_icon} alt="" />
-              {input ? (
-                <img
-                  onClick={() => sendRequest()}
+              {prompt ? (
+                <motion.img
+                  onClick={sendRequest}
                   src={assets.send_icon}
-                  alt=""
+                  alt="Send-Button"
+                  whileHover={{ scale: 1.2 }}
+                  whileTap={{ scale: 0.9 }}
                 />
               ) : null}
             </div>
           </div>
-          <p className="bottom-info">
-            Gemiini may display inaccurate info, including about people, so
-            double-click its responses. Your privacy and Gemini Apps
-          </p>
-        </div>
+          <div className="bottom-info">
+            <p>
+              {" "}
+              AstraAI may display inaccurate info, including about people, so
+              double-check its responses.
+            </p>
+          </div>
+        </motion.div>
       </div>
     </div>
   );

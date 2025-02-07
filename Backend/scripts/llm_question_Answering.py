@@ -114,7 +114,7 @@ def query_documents_context_extraction(query: str, combined_db: list, k_doc: int
     """
     
     try:
-        results = []
+        results = [] 
         
         for db_ in combined_db:
             retriever = db_.as_retriever(

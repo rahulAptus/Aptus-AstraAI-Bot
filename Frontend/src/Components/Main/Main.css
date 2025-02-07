@@ -1,10 +1,14 @@
 .main {
-  flex: 1;
+  display: flex;
+  flex-direction: column;
   min-height: 100vh;
-  padding-bottom: 15vh;
   position: relative;
+  margin-left: 20%; /* Sidebar width */
+  width: 80%; /* Main section width, excluding the sidebar */
+  overflow-x: hidden; /* Prevent horizontal overflow */
+  height: 100vh; /* Full height */
+  padding-bottom: 80px; /* Add space for the fixed prompt bar */
 }
-
 .main .nav {
   display: flex;
   align-items: center;
@@ -36,8 +40,11 @@
 }
 
 .main-container {
-  max-width: 900px;
-  margin: auto;
+  flex-grow: 1;
+  margin-left: 6em;
+  overflow-y: auto; /* Enable scrolling if content overflows */
+  height: 100%; /* Ensure it fills the remaining height */
+  width: 80%; /* Ensure it takes full width */
 }
 
 .main .greet {
@@ -91,18 +98,20 @@
 }
 
 .main-bottom {
-  position: absolute;
+  position: fixed;
   bottom: 0;
   width: 100%;
-  max-width: 900px;
-  padding: 0px 20px;
-  margin: auto;
+  background: white;
+  padding: 1rem;
+  box-shadow: none;
+  z-index: 10; /* Ensure it stays above other elements */
 }
 
 .search-box {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  width: 65%;
   gap: 20px;
   background-color: #f0f4f9;
   padding: 10px 20px;
@@ -129,11 +138,11 @@
   gap: 15px;
 }
 
-.main .bottom-info {
+.main .main-bottom .bottom-info {
   font-size: 13px;
   margin: 15px auto;
-  text-align: center;
   font-weight: 300;
+  margin-left: 15em;
 }
 
 .result {
@@ -194,4 +203,53 @@
 .sources {
   display: flex;
   gap: 10px;
+}
+
+.chat-history {
+  padding: 0px 2%;
+  max-height: calc(
+    100vh - 80px
+  ); /* Full height minus space for fixed bottom bar */
+  width: 100%; /* Ensure it uses full width of the container */
+  margin-bottom: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 15px; /* Add space between messages */
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* Internet Explorer 10+ */
+}
+.chat-entry {
+  padding: 6px 8px;
+  margin: 8px 0;
+  border-radius: 20px;
+  font-size: 16px;
+  line-height: 1.5;
+  max-width: 75%;
+  word-wrap: break-word;
+  display: inline-block;
+  width: auto;
+}
+.user-entry {
+  background-color: #d9e2f2;
+  align-self: flex-end; /* Align user messages to the right */
+  margin-left: auto; /* Optional to avoid unnecessary gap */
+  display: inline-block;
+  max-width: 75%; /* Adjust width based on content */
+}
+
+/* Chatbot's message - align left */
+.chatbot-entry {
+  background-color: #f1f1f1;
+  align-self: flex-start; /* Align chatbot messages to the left */
+  display: inline-block;
+  gap: 10px;
+  max-width: 75%; /* Adjust width based on content */
+  padding: 2em;
+}
+
+.profile-img {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  margin-right: 10px;
 }

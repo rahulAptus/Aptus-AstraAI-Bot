@@ -1,6 +1,6 @@
 # Loading the functions from the differnet scripts
 from langchain.globals import set_llm_cache
-from helpers.tools import ASK_Question_On_Your_Documents_, company_contact_details, aptus_data_labs_introduction
+from helpers.tools import ASK_Question_On_Your_Documents_, company_contact_details, aptus_data_labs_introduction, schedule_appointment
 from langgraph.checkpoint.memory import MemorySaver
 from langgraph.graph import MessagesState
 from langchain_core.messages import HumanMessage, SystemMessage
@@ -55,7 +55,7 @@ def filter_messages2(state: MessagesState):
 
     filtered_messages.reverse()
 
-    print(f"Filtered messages (at least 3 pairs): {filtered_messages}")
+    # print(f"Filtered messages (at least 3 pairs): {filtered_messages}")
     return {"messages": filtered_messages}
 
 # Here we are setting the model to be used for the interaction with the user.   
@@ -73,7 +73,7 @@ sys_msg = SystemMessage(content="You are a helpful AI assistant named: Aptus Bud
 
 
 # Node
-tools = [ASK_Question_On_Your_Documents_,company_contact_details,aptus_data_labs_introduction]
+tools = [ASK_Question_On_Your_Documents_,company_contact_details,aptus_data_labs_introduction, schedule_appointment]
 llm_with_tools = llm.bind_tools(tools)
 
 # Node
@@ -90,7 +90,7 @@ def tool_calling_llm(state: MessagesState):
 builder = StateGraph(MessagesState)
 builder.add_node("filter", filter_messages2)
 builder.add_node("Assistant", tool_calling_llm)
-builder.add_node("tools", ToolNode([ASK_Question_On_Your_Documents_,company_contact_details,aptus_data_labs_introduction]))
+builder.add_node("tools", ToolNode([ASK_Question_On_Your_Documents_,company_contact_details,aptus_data_labs_introduction,schedule_appointment]))
 builder.add_edge(START, "filter")
 builder.add_edge("filter", "Assistant")
 builder.add_conditional_edges(

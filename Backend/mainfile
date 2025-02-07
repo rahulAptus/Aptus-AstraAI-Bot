@@ -16,8 +16,8 @@ load_dotenv(override=True)
 from helpers.graph import graph  # Inititalizing the graph
 from langchain.globals import set_llm_cache
 from langchain_community.cache import InMemoryCache
+import asyncio
 # import streamlit as st
-
 # Main Script for Business Logic
 # To run this script, execute the following command in your command prompt:
 # (d:\projects_aptus\Aptus_BOT\.conda) D:\projects_aptus\Aptus_BOT> python -m chatbot_main
@@ -62,54 +62,48 @@ app.add_middleware(
 
 class QueryData(BaseModel):
     prompt: str
-    thread_id: int
+
 # print("Chat session ended.")
 
 ############################### for front -end #####################################
 # @st.cache_data
-def agent(query: str, thread_id: int):
-    ''' Single function which takes the user input and gives response
-    in integration this function should be called
 
-    '''
-
-    t_id = thread_id   
-    
-    config = {"configurable": {"thread_id": "{t_id}"}}
-
-    # Till it loads ui will show - connecting to the agent...    
-    print("[INFO]: Connected to the agent, you may ask your queries now !")
-    
-    # Taking the input from the front end (user_query: string, thread_id = int, end = Boll)        
-    
-    user_query = query  # I can replace this input by the input function by the UI 
-
-
-    # Flag harmful query
-    print("flagging")
-    flag = moderation(user_query)
+# @app.post("/prompt")
+# async def agent(thread_id: int,data:QueryData):
+#     ''' Single function which takes the user input and gives response
+#     in integration this function should be called
+#     '''
+#     t_id = thread_id   
+#     config = {"configurable": {"thread_id": "{t_id}"}}
+#     # Till it loads ui will show - connecting to the agent...    
+#     print("[INFO]: Connected to the agent, you may ask your queries now !")
+#     # Taking the input from the front end (user_query: string, thread_id = int, end = Boll)        
+#     user_query = data.prompt  # I can replace this input by the input function by the UI 
+#     # Flag harmful query
+#     print("flagging")
+#     flag = moderation(user_query)
     
 
-    if not flag:
-        ans_inst = "Don’t justify your answers. Don’t give information not mentioned in the context information."
-        messages = [HumanMessage(content=f"{user_query} # Answer Instructions: {ans_inst} ")]
-        messages = graph.invoke({"messages": messages}, config)      
-        #Simulate getting the end flag from the frontend
-        response = processing_agent_response(messages, query)
-        print("Response:", response)
+#     if not flag:
+#         ans_inst = "Don't justify your answers. Don't give information not mentioned in the context information."
+#         messages = [HumanMessage(content=f"{user_query} # Answer Instructions: {ans_inst} ")]
+#         messages = graph.invoke({"messages": messages}, config)      
+#         #Simulate getting the end flag from the frontend
+#         response = processing_agent_response(messages, user_query)
+#         print("Response:", response)
         
         
-    else:
-        response = {
-        "chatbot_response": "Kindly ask Relevant Question.",
-        "sources": [],
-        "display_output_format": "Markdown",
-        "user_query":query,  
-        }
+#     else:
+#         response = {
+#         "chatbot_response": "Kindly ask Relevant Question.",
+#         "sources": [],
+#         "display_output_format": "Markdown",
+#         "user_query":data.query,  
+#         }
 
-        print("Response:", response)
+#         print("Response:", response)
 
-    return response
+#     return response
 
 ############################################### B L - T E S T I N G ########################################################
 # making the function for testing the  end to end business logic in the script
@@ -117,11 +111,8 @@ def agent(query: str, thread_id: int):
 async def chat_bot_BL(data:QueryData):
     ''' Single function which takes the user input and gives response
     in integration this function should be called
-
     '''
-    # Session ID
-    t_id = data.thread_id;  # from the ui  
-    print("Thread ID:", t_id)
+    t_id = 11223;  # thread_id   
     from helpers.graph import graph  # Inititalizing the graph
     config = {"configurable": {"thread_id": "{t_id}"}}
 
@@ -136,11 +127,12 @@ async def chat_bot_BL(data:QueryData):
         user_query = data.prompt
         # Simulate getting the end flag from the frontend
         # end = input("Is this your last query (yes/no)? ").strip().lower() == "yes" 
+        # Database Connection for FAq's(db1)
         # Flag harmful query
         print("flagging")
-        flag = moderation(user_query)
-
-
+        flag = moderation(user_query) # Moderation Check
+        # Adding query prior to databse(db2)
+        print(flag)
         if not flag:
             ans_inst = "Don’t justify your answers. Don’t give information not mentioned in the context information."
             messages = [HumanMessage(content=f"{user_query} # Answer Instructions: {ans_inst} ")]
@@ -150,36 +142,101 @@ async def chat_bot_BL(data:QueryData):
             if i == 10:
                 end = True
                 print("[INFO]: Last query--> Stopping the session...")
-
             response = processing_agent_response(messages, user_query)
             print("Response:", response)
+            chatbot_response = response.get("chatbot_response", "No response available")
+            print ("Chatbot Response:", chatbot_response)
+            print ("Sources:", response["sources"])
+            
             return response,response["sources"]
         else:
+            print("[INFO]: Last query --> Stopping the session...")
+            end = True        
             response = {
-            "chatbot_response": "Kindly ask Relevant Question.",
-            "sources": ["Moderation"],
-             "user_query":user_query, 
-             "display_output_format": "Markdown"
-                }
-            print("Response:", response)
-    await chat_bot_BL(data)
-    print("Chat session ended.")
+                "chatbot_response": "Kindly ask Relevant Question.",
+                "sources": ["Moderation"],
+                "user_query":user_query, 
+                "display_output_format": "Markdown"
+                    }
+            print(response)
+            return response
+   
+print("Chat session ended.")
+
+
+# async def chat_bot_BL(data: QueryData):
+#     """Handles user queries and streams chatbot responses in chunks."""
+    
+#     t_id = 11223  # Thread ID
+#     config = {"configurable": {"thread_id": f"{t_id}"}}
+    
+#     print("[INFO]: Connected to the agent, you may ask your queries now!")
+
+#     user_query = data.prompt
+#     flag = moderation(user_query)  # Moderation Check
+#     print("Moderation flag:", flag)
+
+#     if flag:
+#         response = {
+#             "chatbot_response": "Kindly ask a relevant question.",
+#             "sources": ["Moderation"],
+#             "user_query": user_query,
+#             "display_output_format": "Markdown"
+#         }
+#         yield response["chatbot_response"]
+#         return
+
+#     ans_inst = "Don’t justify your answers. Don’t give information not mentioned in the context information."
+#     messages = [HumanMessage(content=f"{user_query} # Answer Instructions: {ans_inst} ")]
+    
+#     messages = graph.invoke({"messages": messages}, config)
+#     response_text = processing_agent_response(messages, user_query)
+
+#     # Split response into chunks (adjust size as needed)
+#     for chunk in split_into_chunks(response_text, size=50):
+#         yield chunk
+#         await asyncio.sleep(0.1)  # Simulate streaming delay
+
+#     print("[INFO]: Response streaming completed.")
+
+
+# @app.websocket("/ws")
+# async def websocket_endpoint(websocket: WebSocket):
+#     """Handles WebSocket connection for real-time chat responses in chunks."""
+#     await websocket.accept()
+#     try:
+#         while True:
+#             prompt = await websocket.receive_text()
+#             query_data = QueryData(prompt=prompt)
+            
+#             # Stream AI response in chunks
+#             async for chunk in chat_bot_BL(query_data):
+#                 await websocket.send_text(chunk)
+            
+#             # Send a special termination signal (optional)
+#             await websocket.send_text("[END]")  
+#     except Exception as e:
+#         print(f"WebSocket error: {e}")
+#     finally:
+#         await websocket.close()
+
+
 
 if __name__ == "__main__":
     from helpers.graph import graph
 
-    #  # user_query = input("Ask query: ") # from the front end --> connect me to the agent.
-    # trigger = True  # I will get the trigger from the front end when the user click on connect to the agent
-    # thread_id = 100 # from the ui
-    # if trigger == True:
-    #     i = 0
-    #     while (i<10):
+     # user_query = input("Ask query: ") # from the front end --> connect me to the agent.
+    trigger = True  # I will get the trigger from the front end when the user click on connect to the agent
+    thread_id = 100 # from the ui
+    if trigger == True:
+        i = 0
+        while (i<10):
            
-    #         i+= 1
-    #         if i == 9:
-    #             print("[INFO]: This is your last query")
+            i+= 1
+            if i == 9:
+                print("[INFO]: This is your last query")
 
-            
+            chat_bot_BL(thread_id= thread_id)
             
             
 
