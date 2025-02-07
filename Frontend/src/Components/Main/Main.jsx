@@ -20,19 +20,34 @@ const Main = () => {
   const generateThreadId = () => {
     return Math.floor(Math.random() * 1000000);
   };
+
   useEffect(() => {
     setThreadId(generateThreadId());
   }, []);
 
   const scrollToBottom = () => {
+<<<<<<< HEAD
     setTimeout(() => {
       dummyRef.current?.scrollIntoView({ behavior: "smooth" });
     }, 100);
+=======
+    if (dummyRef.current) {
+      dummyRef.current.scrollIntoView({ behavior: "smooth",block: "end"});
+    }
+>>>>>>> ff59af8f693d5bb8c3ec245430590b81b004f899
   };
+  
 
   useEffect(() => {
     scrollToBottom();
   }, [result, loading]); // Run when messages update
+
+ 
+  
+
+  // useEffect(() => {
+  //   setTimeout(scrollToBottom, 200); // Small delay to ensure message renders first
+  // }, [result, loading]);
 
   const sendRequest = async () => {
     if (prompt.trim() === "") return;
@@ -47,8 +62,10 @@ const Main = () => {
     setLoading(true);
     setPrompt("");
 
+    setTimeout(() => scrollToBottom(), 50);
+
     try {
-      const res = await axios.post("http://localhost:8000/prompt", {
+      const res = await axios.post("http://localhost:8020/prompt", {
         prompt: userMessage,
         thread_id: threadId,
       });
@@ -86,6 +103,11 @@ const Main = () => {
                 ];
               }
             });
+            // if (index === responseText.length - 1) {
+            //   setTimeout(() => {
+            //     scrollToBottom();
+            //   }, 100);}
+            scrollToBottom();
           }, index * 50); // Simulate streaming effect (50ms delay per character)
         });
       }
@@ -97,12 +119,10 @@ const Main = () => {
       } else {
         setShowSources(false);
       }
-      console.log("Sources:", sources);
       setSources((prevSource) => [
         ...prevSource,
         { type: "chatbot", text: sourceArray },
       ]);
-      // setSources(sourceArray); // Update sources
     } catch (error) {
       console.error("Error fetching response:", error);
       setShowResult(true);
@@ -245,9 +265,82 @@ const Main = () => {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ duration: 0.5 }}
+<<<<<<< HEAD
               ></motion.div>
             )}
             <div ref={dummyRef} />
+=======
+                style={{
+                  maxHeight: "calc(100vh - 150px)",
+                }}
+              >
+                {Array.isArray(result) &&
+                  result.map((entry, index) => (
+                    <motion.div
+                      key={index}
+                      className={`chat-entry ${
+                        entry.type === "user" ? "user-entry" : "chatbot-entry"
+                      }`}
+                      initial={{
+                        x: entry.type === "user" ? 50 : -50,
+                        opacity: 0,
+                      }}
+                      animate={{ x: 0, opacity: 1 }}
+                      transition={{ duration: 0.5 }}
+                    >
+                      {/* Profile Image */}
+                      <img
+                        src={
+                          entry.type === "user"
+                            ? assets.user_avatar
+                            : assets.logo_buddy
+                        }
+                        alt={entry.type === "user" ? "User" : "Chatbot"}
+                        className="profile-img"
+                      />
+
+                      {/* Message Text */}
+                      <div className="message-content">
+                        {isHTML ? (
+                          <div
+                            dangerouslySetInnerHTML={{ __html: entry.text }}
+                          />
+                        ) : (
+                          // Render as Markdown
+                          <ReactMarkdown>{entry.text}</ReactMarkdown>
+                        )}
+                        {showSources && sources.length > 0 && (
+                          <div className="sources">
+                            <h3>Sources</h3>
+                            {sources.map((source, idx) => (
+                              <div key={idx} className="source_box">
+                                <a
+                                  href={source}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                >
+                                  {source}
+                                </a>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    </motion.div>
+                  ))}
+              </div>
+              {/* Loading Indicator */}
+              {loading && (
+                <motion.div
+                  className="loader"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ duration: 0.5 }}
+                ></motion.div>
+              )}
+            </div >
+            <div ref={dummyRef} style={{ marginBottom: "100px" }}  />
+>>>>>>> ff59af8f693d5bb8c3ec245430590b81b004f899
           </>
         )}
 
