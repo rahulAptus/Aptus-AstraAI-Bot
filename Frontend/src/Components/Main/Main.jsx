@@ -25,9 +25,9 @@ const Main = () => {
   }, []);
 
   const scrollToBottom = () => {
-    if (dummyRef.current) {
-      dummyRef.current.scrollIntoView({ behavior: "smooth" });
-    }
+    setTimeout(() => {
+      dummyRef.current?.scrollIntoView({ behavior: "smooth" });
+    }, 100);
   };
 
   useEffect(() => {
@@ -36,6 +36,8 @@ const Main = () => {
 
   const sendRequest = async () => {
     if (prompt.trim() === "") return;
+    setShowSources(false);
+    setSources([]);
     const userMessage = prompt;
     setResult((prevResult) => [
       ...prevResult,
@@ -115,7 +117,7 @@ const Main = () => {
   };
 
   return (
-    <div className="main" style={{ overflow: "hidden" }}>
+    <div className="main">
       <motion.div
         className="nav"
         initial={{ y: -50, opacity: 0 }}
@@ -177,82 +179,74 @@ const Main = () => {
           </>
         ) : (
           <>
-            <div className="chat-container" style={{ overflowY: "auto" }}>
-              {/* Chat History */}
-              <div
-                className="chat-history"
+            <div
+              className="chat-history"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.5 }}
+            >
+              {Array.isArray(result) &&
+                result.map((entry, index) => (
+                  <motion.div
+                    key={index}
+                    className={`chat-entry ${
+                      entry.type === "user" ? "user-entry" : "chatbot-entry"
+                    }`}
+                    initial={{
+                      x: entry.type === "user" ? 50 : -50,
+                      opacity: 0,
+                    }}
+                    animate={{ x: 0, opacity: 1 }}
+                    transition={{ duration: 0.5 }}
+                  >
+                    {/* Profile Image */}
+                    <img
+                      src={
+                        entry.type === "user"
+                          ? assets.user_avatar
+                          : assets.logo_buddy
+                      }
+                      alt={entry.type === "user" ? "User" : "Chatbot"}
+                      className="profile-img"
+                    />
+
+                    {/* Message Text */}
+                    <div className="message-content">
+                      {isHTML ? (
+                        <div dangerouslySetInnerHTML={{ __html: entry.text }} />
+                      ) : (
+                        // Render as Markdown
+                        <ReactMarkdown>{entry.text}</ReactMarkdown>
+                      )}
+                      {showSources && sources.length > 0 && (
+                        <div className="sources">
+                          <h3>Sources</h3>
+                          {sources.map((source, idx) => (
+                            <div key={idx} className="source_box">
+                              <a
+                                href={source}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                              >
+                                {source}
+                              </a>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  </motion.div>
+                ))}
+            </div>
+            {/* Loading Indicator */}
+            {loading && (
+              <motion.div
+                className="loader"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ duration: 0.5 }}
-                style={{
-                  maxHeight: "calc(100vh - 150px)",
-                }}
-              >
-                {Array.isArray(result) &&
-                  result.map((entry, index) => (
-                    <motion.div
-                      key={index}
-                      className={`chat-entry ${
-                        entry.type === "user" ? "user-entry" : "chatbot-entry"
-                      }`}
-                      initial={{
-                        x: entry.type === "user" ? 50 : -50,
-                        opacity: 0,
-                      }}
-                      animate={{ x: 0, opacity: 1 }}
-                      transition={{ duration: 0.5 }}
-                    >
-                      {/* Profile Image */}
-                      <img
-                        src={
-                          entry.type === "user"
-                            ? assets.user_avatar
-                            : assets.logo_buddy
-                        }
-                        alt={entry.type === "user" ? "User" : "Chatbot"}
-                        className="profile-img"
-                      />
-
-                      {/* Message Text */}
-                      <div className="message-content">
-                        {isHTML ? (
-                          <div
-                            dangerouslySetInnerHTML={{ __html: entry.text }}
-                          />
-                        ) : (
-                          // Render as Markdown
-                          <ReactMarkdown>{entry.text}</ReactMarkdown>
-                        )}
-                        {showSources && sources.length > 0 && (
-                          <div className="sources">
-                            <h3>Sources</h3>
-                            {sources.map((source, idx) => (
-                              <div key={idx} className="source_box">
-                                <a
-                                  href={source}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                >
-                                  {source}
-                                </a>
-                              </div>
-                            ))}
-                          </div>
-                        )}
-                      </div>
-                    </motion.div>
-                  ))}
-              </div>
-              {/* Loading Indicator */}
-              {loading && (
-                <motion.div
-                  className="loader"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ duration: 0.5 }}
-                ></motion.div>
-              )}
-            </div>
+              ></motion.div>
+            )}
             <div ref={dummyRef} />
           </>
         )}
@@ -266,7 +260,7 @@ const Main = () => {
             position: "fixed",
             bottom: 0,
             background: "white",
-            padding: "1rem",
+            padding: "0.5rem",
             boxShadow: "none",
             zIndex: 10,
           }}
