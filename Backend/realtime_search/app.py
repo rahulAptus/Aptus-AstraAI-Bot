@@ -22,11 +22,6 @@ from dotenv import load_dotenv
 load_dotenv()
 os.environ["OPENAI_API_KEY"] = os.getenv("OPENAI_API_KEY")
 
-
-API_KEY = "AIzaSyDkHLJ-sZWzmXbZWahTXVsMlWZSb-6h1B8"  
-CSE_ID = "a1845a1effa304fad" 
-
-
 # Initialize OpenAI client
 client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
