@@ -26,24 +26,17 @@ const Main = () => {
   }, []);
 
   const scrollToBottom = () => {
-<<<<<<< HEAD
     setTimeout(() => {
       dummyRef.current?.scrollIntoView({ behavior: "smooth" });
     }, 100);
-=======
     if (dummyRef.current) {
-      dummyRef.current.scrollIntoView({ behavior: "smooth",block: "end"});
+      dummyRef.current.scrollIntoView({ behavior: "smooth", block: "end" });
     }
->>>>>>> ff59af8f693d5bb8c3ec245430590b81b004f899
   };
-  
 
   useEffect(() => {
     scrollToBottom();
   }, [result, loading]); // Run when messages update
-
- 
-  
 
   // useEffect(() => {
   //   setTimeout(scrollToBottom, 200); // Small delay to ensure message renders first
@@ -65,7 +58,7 @@ const Main = () => {
     setTimeout(() => scrollToBottom(), 50);
 
     try {
-      const res = await axios.post("http://localhost:8020/prompt", {
+      const res = await axios.post("http://localhost:8000/prompt", {
         prompt: userMessage,
         thread_id: threadId,
       });
@@ -207,77 +200,30 @@ const Main = () => {
             >
               {Array.isArray(result) &&
                 result.map((entry, index) => (
-                  <motion.div
+                  <div
                     key={index}
-                    className={`chat-entry ${
-                      entry.type === "user" ? "user-entry" : "chatbot-entry"
+                    className={`chat-wrapper ${
+                      entry.type === "user" ? "user-wrapper" : "chatbot-wrapper"
                     }`}
-                    initial={{
-                      x: entry.type === "user" ? 50 : -50,
-                      opacity: 0,
-                    }}
-                    animate={{ x: 0, opacity: 1 }}
-                    transition={{ duration: 0.5 }}
                   >
-                    {/* Profile Image */}
-                    <img
-                      src={
-                        entry.type === "user"
-                          ? assets.user_avatar
-                          : assets.logo_buddy
-                      }
-                      alt={entry.type === "user" ? "User" : "Chatbot"}
-                      className="profile-img"
-                    />
+                    {/* Chatbot Image (Left) */}
+                    {entry.type === "chatbot" && (
+                      <img
+                        src={assets.logo_buddy}
+                        alt="Chatbot"
+                        className="profile-img chatbot-img"
+                      />
+                    )}
+                    {entry.type === "user" && (
+                      <img
+                        src={assets.user_avatar}
+                        alt="User"
+                        className="profile-img user-img"
+                      />
+                    )}
 
-                    {/* Message Text */}
-                    <div className="message-content">
-                      {isHTML ? (
-                        <div dangerouslySetInnerHTML={{ __html: entry.text }} />
-                      ) : (
-                        // Render as Markdown
-                        <ReactMarkdown>{entry.text}</ReactMarkdown>
-                      )}
-                      {showSources && sources.length > 0 && (
-                        <div className="sources">
-                          <h3>Sources</h3>
-                          {sources.map((source, idx) => (
-                            <div key={idx} className="source_box">
-                              <a
-                                href={source}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                              >
-                                {source}
-                              </a>
-                            </div>
-                          ))}
-                        </div>
-                      )}
-                    </div>
-                  </motion.div>
-                ))}
-            </div>
-            {/* Loading Indicator */}
-            {loading && (
-              <motion.div
-                className="loader"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ duration: 0.5 }}
-<<<<<<< HEAD
-              ></motion.div>
-            )}
-            <div ref={dummyRef} />
-=======
-                style={{
-                  maxHeight: "calc(100vh - 150px)",
-                }}
-              >
-                {Array.isArray(result) &&
-                  result.map((entry, index) => (
+                    {/* Chat Entry */}
                     <motion.div
-                      key={index}
                       className={`chat-entry ${
                         entry.type === "user" ? "user-entry" : "chatbot-entry"
                       }`}
@@ -289,15 +235,6 @@ const Main = () => {
                       transition={{ duration: 0.5 }}
                     >
                       {/* Profile Image */}
-                      <img
-                        src={
-                          entry.type === "user"
-                            ? assets.user_avatar
-                            : assets.logo_buddy
-                        }
-                        alt={entry.type === "user" ? "User" : "Chatbot"}
-                        className="profile-img"
-                      />
 
                       {/* Message Text */}
                       <div className="message-content">
@@ -327,20 +264,18 @@ const Main = () => {
                         )}
                       </div>
                     </motion.div>
-                  ))}
-              </div>
-              {/* Loading Indicator */}
-              {loading && (
-                <motion.div
-                  className="loader"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ duration: 0.5 }}
-                ></motion.div>
-              )}
-            </div >
-            <div ref={dummyRef} style={{ marginBottom: "100px" }}  />
->>>>>>> ff59af8f693d5bb8c3ec245430590b81b004f899
+                  </div>
+                ))}
+            </div>
+            {loading && (
+              <motion.div
+                className="loader"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.5 }}
+              ></motion.div>
+            )}
+            <div ref={dummyRef} style={{ marginBottom: "100px" }} />
           </>
         )}
 

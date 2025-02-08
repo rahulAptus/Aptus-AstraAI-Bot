@@ -43,7 +43,7 @@ book_appointment_widget ='''<!DOCTYPE html>
         }
 
         #appointment-btn:hover {
-            background-color: #004d40; /* Darker teal on hover */
+            background-color: #0062a5; /* Darker teal on hover */
         }
     </style>
 </head>
@@ -54,13 +54,6 @@ book_appointment_widget ='''<!DOCTYPE html>
         <p>We value your time! Schedule a hassle-free appointment with us and let’s discuss how we can help you.</p>
         <a id="appointment-btn" href= "https://calendly.com/aptusdatalabs" target="_blank">Fix Appointment</a>
     </div>
-
-
-    # <script>
-    #     document.getElementById('appointment-btn').addEventListener('click', () => {
-    #         window.open('https://calendly.com/aptusdatalabs', '_blank'); 
-    #     });
-    # </script>
 </body>
 </html>
 '''
