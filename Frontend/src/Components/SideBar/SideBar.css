@@ -109,3 +109,96 @@
   background: rgba(255, 255, 255, 0.1);
   transform: translateX(5px);
 }
+.logo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+.title {
+  font-size: 22px;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.ai-icon {
+  font-size: 28px;
+  color: #00bfff;
+}
+
+
+
+.features-title {
+    font-size: 25px;
+    font-weight: bold;
+    margin-top: 8px;
+    border-bottom: 2px solid #ffffff30;
+    padding-bottom: 5px;
+    margin-right:10px;
+}
+
+.features {
+    list-style: none;
+    padding: 0;
+}
+
+.feature-item {
+    font-size: 18px;
+    margin: 8px 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.icon {
+    font-size: 16px;
+}
+
+.cta {
+    text-align: center;
+    margin-top: 15px;
+}
+.try-btn{
+background: linear-gradient(135deg, #0062a5, #8cc63e);
+color: white;
+border: none;
+padding: 12px 18px;
+border-radius: 8px;
+cursor: pointer;
+font-weight: 600;
+transition: all 0.4s ease-in-out;
+text-transform: uppercase;
+letter-spacing: 1px;
+display: inline-block;
+}
+
+.try-btn:hover {
+background: linear-gradient(135deg, #8cc63e, #0062a5);
+transform: scale(1.08);
+box-shadow: 0px 4px 15px rgba(0, 98, 165, 0.5);
+}
+
+.footer {
+    font-size: 12px;
+    text-align: center;
+    opacity: 0.7;
+    margin-top: 15px;
+}
+.features li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+  margin-bottom: 8px;
+  transition: all 0.3s ease-in-out;
+}
+
+.features li:hover {
+  background: rgba(255, 255, 255, 0.1);
+  transform: translateX(5px);
+}
