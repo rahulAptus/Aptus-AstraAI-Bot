@@ -65,5 +65,6 @@ function Sidebar() {
       </div>
     </motion.div>
   );
+}
 
 export default Sidebar;
