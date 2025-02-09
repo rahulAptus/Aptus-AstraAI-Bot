@@ -17,13 +17,95 @@
 }
 
 .sidebar-intro {
-  font-size: 18px;
+  font-size: 15px;
   color: #2c3e50;
   font-weight: 600;
   line-height: 1.6;
   padding: 15px;
-  border-radius: 12px;
+  border-radius: 9px;
   background: rgba(255, 255, 255, 0.3);
   box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.05);
-  margin-bottom: 30px;
+  margin-bottom: 20px;
+}
+.logo > img {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 15px;
+  width: 100%;
+}
+
+.features-title {
+  font-size: 25px;
+  font-weight: bold;
+  margin-right: 10px;
+}
+
+.features {
+  list-style: none;
+  width: 100%; /* Use full width of sidebar */
+  display: flex;
+  flex-direction: column; /* Stack items vertically */
+  align-items: flex-start; /* Align items to the left */
+  padding: 0px 25px; /* Add padding for better spacing */
+}
+
+.feature-item {
+  display: flex;
+  align-items: center; /* Align icon and text horizontally */
+  gap: 10px; /* Space between icon and text */
+  font-size: 15px;
+  cursor: pointer; /* Make it clickable */
+  width: 100%; /* Take full width for alignment */
+}
+
+.feature-item h4 {
+  margin: 0;
+  font-size: 16px;
+  color: #000000; /* Adjust text color if needed */
+  font-weight: 700;
+}
+
+.cta {
+  text-align: center;
+  margin-top: 15px;
+}
+.try-btn {
+  background: linear-gradient(135deg, #0062a5, #8cc63e);
+  color: white;
+  border: none;
+  padding: 12px 18px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.4s ease-in-out;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  display: inline-block;
+}
+
+.try-btn:hover {
+  background: linear-gradient(135deg, #8cc63e, #0062a5);
+  transform: scale(1.08);
+  box-shadow: 0px 4px 15px rgba(0, 98, 165, 0.5);
+}
+.footer {
+  font-size: 12px;
+  text-align: center;
+  opacity: 0.7;
+  margin-top: 5px;
+}
+.features div {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  padding: 10px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+  transition: all 0.3s ease-in-out;
+}
+
+.features div:hover {
+  background: rgba(255, 255, 255, 0.1);
+  transform: translateX(5px);
 }

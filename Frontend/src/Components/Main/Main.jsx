@@ -3,6 +3,7 @@ import { assets } from "../../assets/assets";
 import axios from "axios";
 import ReactMarkdown from "react-markdown";
 import { motion } from "framer-motion";
+import ChatLoader from "../Chatloader/Chatloader";
 import "./Main.css";
 
 const Main = () => {
@@ -16,14 +17,49 @@ const Main = () => {
   const [threadId, setThreadId] = useState(0);
   const chatContainerRef = useRef(null);
   const dummyRef = useRef(null); // Reference for auto-scroll
+  const [preview, setPreview] = useState(null);
+  const [hoveredUrl, setHoveredUrl] = useState(null);
+  const hoverTimeout = useRef(null);
+
+  const fetchPreview = async (url) => {
+    try {
+      console.log("Fetching preview for:", url);
+      setHoveredUrl(url); // Store hovered URL
+
+      const response = await axios.get(
+        "http://localhost:8001/get-link-preview",
+        {
+          params: { url },
+        }
+      );
+
+      console.log("API Response:", response.data);
+      setPreview(response.data);
+    } catch (error) {
+      console.error("Error fetching preview:", error);
+      setPreview(null);
+    }
+  };
 
   const generateThreadId = () => {
+    console.log("generateThreadId :", Math.floor(Math.random() * 1000000));
     return Math.floor(Math.random() * 1000000);
   };
 
   useEffect(() => {
     setThreadId(generateThreadId());
   }, []);
+
+  const handleMouseEnter = (url) => {
+    hoverTimeout.current = setTimeout(() => {
+      fetchPreview(url);
+    }, 500); // Wait 500ms before calling API
+  };
+
+  const handleMouseLeave = () => {
+    clearTimeout(hoverTimeout.current);
+    setPreview(null);
+  };
 
   const scrollToBottom = () => {
     setTimeout(() => {
@@ -38,9 +74,87 @@ const Main = () => {
     scrollToBottom();
   }, [result, loading]); // Run when messages update
 
-  // useEffect(() => {
-  //   setTimeout(scrollToBottom, 200); // Small delay to ensure message renders first
-  // }, [result, loading]);
+  // const sendRequest = async () => {
+  //   if (prompt.trim() === "") return;
+  //   setShowSources(false);
+  //   setSources([]);
+  //   const userMessage = prompt;
+  //   setResult((prevResult) => [
+  //     ...prevResult,
+  //     { type: "user", text: userMessage },
+  //   ]);
+  //   setShowResult(true);
+  //   setLoading(true);
+  //   setPrompt("");
+
+  //   setTimeout(() => scrollToBottom(), 50);
+
+  //   try {
+  //     const res = await axios.post("http://localhost:8000/prompt", {
+  //       prompt: userMessage,
+  //       thread_id: threadId,
+  //     });
+  //     setLoading(false);
+  //     const data = res.data[0] || {}; // Default to an empty object if undefined
+  //     let responseText = data.chatbot_response;
+  //     const isHTML = /<\/?[a-z][\s\S]*>/i.test(responseText);
+  //     let accumulatedText = "";
+
+  //     if (isHTML) {
+  //       setIsHTML(true);
+  //       setResult((prevResult) => [
+  //         ...prevResult,
+  //         { type: "chatbot", text: responseText },
+  //       ]);
+  //     } else {
+  //       setIsHTML(false);
+  //       responseText.split("").forEach((char, index) => {
+  //         setTimeout(() => {
+  //           accumulatedText += char;
+  //           setResult((prevResult) => {
+  //             // Update only the last chatbot message
+  //             if (
+  //               prevResult.length > 0 &&
+  //               prevResult[prevResult.length - 1].type === "chatbot"
+  //             ) {
+  //               return [
+  //                 ...prevResult.slice(0, -1), // Remove the last chatbot message
+  //                 { type: "chatbot", text: accumulatedText }, // Update it with new text
+  //               ];
+  //             } else {
+  //               return [
+  //                 ...prevResult,
+  //                 { type: "chatbot", text: accumulatedText },
+  //               ];
+  //             }
+  //           });
+  //           if (index === responseText.length - 1) {
+  //             setTimeout(() => {
+  //               scrollToBottom();
+  //             }, 100);
+  //           }
+  //           scrollToBottom();
+  //         }, index * 30); // Simulate streaming effect (50ms delay per character)
+  //       });
+  //     }
+
+  //     let sourceArray = data.sources || [];
+  //     setShowSources(true);
+  //     if (typeof sourceArray === "string") {
+  //       sourceArray = sourceArray.split(",").map((source) => source.trim());
+  //     } else {
+  //       setShowSources(false);
+  //     }
+  //     setSources((prevSource) => [
+  //       ...prevSource,
+  //       { type: "chatbot", text: sourceArray },
+  //     ]);
+  //   } catch (error) {
+  //     console.error("Error fetching response:", error);
+  //     setShowResult(true);
+  //     setLoading(false);
+  //   }
+  // };
 
   const sendRequest = async () => {
     if (prompt.trim() === "") return;
@@ -54,7 +168,6 @@ const Main = () => {
     setShowResult(true);
     setLoading(true);
     setPrompt("");
-
     setTimeout(() => scrollToBottom(), 50);
 
     try {
@@ -63,10 +176,10 @@ const Main = () => {
         thread_id: threadId,
       });
       setLoading(false);
-      const data = res.data[0] || {}; // Default to an empty object if undefined
+      const data = res.data[0] || {};
       let responseText = data.chatbot_response;
+      let sourceArray = data.sources || [];
       const isHTML = /<\/?[a-z][\s\S]*>/i.test(responseText);
-      let accumulatedText = "";
 
       if (isHTML) {
         setIsHTML(true);
@@ -76,51 +189,71 @@ const Main = () => {
         ]);
       } else {
         setIsHTML(false);
-        responseText.split("").forEach((char, index) => {
-          setTimeout(() => {
-            accumulatedText += char;
-            setResult((prevResult) => {
-              // Update only the last chatbot message
-              if (
-                prevResult.length > 0 &&
-                prevResult[prevResult.length - 1].type === "chatbot"
-              ) {
-                return [
-                  ...prevResult.slice(0, -1), // Remove the last chatbot message
-                  { type: "chatbot", text: accumulatedText }, // Update it with new text
-                ];
-              } else {
-                return [
-                  ...prevResult,
-                  { type: "chatbot", text: accumulatedText },
-                ];
-              }
-            });
-            // if (index === responseText.length - 1) {
-            //   setTimeout(() => {
-            //     scrollToBottom();
-            //   }, 100);}
-            scrollToBottom();
-          }, index * 50); // Simulate streaming effect (50ms delay per character)
-        });
+        let accumulatedText = "";
+        let chatbotMessage = { type: "chatbot", text: "" };
+
+        setResult((prevResult) => [...prevResult, chatbotMessage]);
+
+        setTimeout(() => {
+          let charIndex = 0;
+
+          const interval = setInterval(() => {
+            if (charIndex < responseText.length) {
+              accumulatedText += responseText[charIndex];
+              setResult((prevResult) => {
+                let updatedResults = [...prevResult];
+                let lastMessage = updatedResults[updatedResults.length - 1];
+
+                if (lastMessage && lastMessage.type === "chatbot") {
+                  lastMessage.text = accumulatedText;
+                } else {
+                  updatedResults.push({
+                    type: "chatbot",
+                    text: accumulatedText,
+                  });
+                }
+
+                return [...updatedResults];
+              });
+              charIndex++;
+            } else {
+              clearInterval(interval);
+              setTimeout(() => scrollToBottom(), 100);
+            }
+          }, 30);
+        }, 100);
       }
 
-      let sourceArray = data.sources || [];
-      setShowSources(true);
+      // Convert string to array if needed
       if (typeof sourceArray === "string") {
         sourceArray = sourceArray.split(",").map((source) => source.trim());
+      }
+
+      // Ensure it's an array and contains valid sources
+      if (Array.isArray(sourceArray) && sourceArray.length > 0) {
+        setSources((prevSource) => [
+          ...prevSource,
+          ...sourceArray.map((src) => ({ type: "chatbot", text: src })),
+        ]);
+
+        // ✅ Use a callback to ensure the correct value is set
+        setShowSources(() => {
+          console.log(
+            "sourceArray exists, setting showSources to true:",
+            sourceArray
+          );
+          return true;
+        });
       } else {
         setShowSources(false);
+        console.log("No sources found, setting showSources to false.");
       }
-      setSources((prevSource) => [
-        ...prevSource,
-        { type: "chatbot", text: sourceArray },
-      ]);
     } catch (error) {
       console.error("Error fetching response:", error);
       setShowResult(true);
       setLoading(false);
     }
+    console.log("sendRequest :", sources);
   };
 
   const handleKeyPress = (e) => {
@@ -234,8 +367,46 @@ const Main = () => {
                       animate={{ x: 0, opacity: 1 }}
                       transition={{ duration: 0.5 }}
                     >
-                      {/* Profile Image */}
-
+                      {entry.type === "chatbot" &&
+                        showSources &&
+                        sources.length > 0 && (
+                          <div className="sources">
+                            <h3>Sources</h3>
+                            <div className="source-boxes">
+                              {sources.map((source, idx) => (
+                                <div
+                                  key={idx}
+                                  className="source_box"
+                                  onMouseEnter={() =>
+                                    handleMouseEnter(source.text)
+                                  }
+                                  onMouseLeave={handleMouseLeave}
+                                >
+                                  <a
+                                    href={source.text}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                  >
+                                    Aptus Data Labs
+                                  </a>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+                      {preview && hoveredUrl && (
+                        <div className="preview-box">
+                          <img
+                            src={preview.image}
+                            alt={preview.title}
+                            className="preview-image"
+                          />
+                          <div>
+                            <h4>{preview.title}</h4>
+                            <p>{preview.description}</p>
+                          </div>
+                        </div>
+                      )}
                       {/* Message Text */}
                       <div className="message-content">
                         {isHTML ? (
@@ -243,24 +414,7 @@ const Main = () => {
                             dangerouslySetInnerHTML={{ __html: entry.text }}
                           />
                         ) : (
-                          // Render as Markdown
                           <ReactMarkdown>{entry.text}</ReactMarkdown>
-                        )}
-                        {showSources && sources.length > 0 && (
-                          <div className="sources">
-                            <h3>Sources</h3>
-                            {sources.map((source, idx) => (
-                              <div key={idx} className="source_box">
-                                <a
-                                  href={source}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                >
-                                  {source}
-                                </a>
-                              </div>
-                            ))}
-                          </div>
                         )}
                       </div>
                     </motion.div>
@@ -268,12 +422,13 @@ const Main = () => {
                 ))}
             </div>
             {loading && (
-              <motion.div
-                className="loader"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ duration: 0.5 }}
-              ></motion.div>
+              // <motion.div
+              //   className="loader"
+              //   initial={{ opacity: 0 }}
+              //   animate={{ opacity: 1 }}
+              //   transition={{ duration: 0.5 }}
+              // ></motion.div>
+              <ChatLoader />
             )}
             <div ref={dummyRef} style={{ marginBottom: "100px" }} />
           </>
@@ -285,10 +440,7 @@ const Main = () => {
           animate={{ opacity: 1 }}
           transition={{ duration: 0.7 }}
           style={{
-            position: "fixed",
-            bottom: 0,
             background: "white",
-            padding: "0.5rem",
             boxShadow: "none",
             zIndex: 10,
           }}

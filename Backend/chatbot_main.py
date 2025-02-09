@@ -54,7 +54,7 @@ from langchain_community.cache import InMemoryCache
 app = FastAPI()
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5174"],  # Adjust based on frontend URL
+    allow_origins=["http://localhost:5173"],  # Adjust based on frontend URL
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
